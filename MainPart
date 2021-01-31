@@ -1,0 +1,154 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class MainPart {
+    private static SaleSystem account=new SaleSystem();
+    private static Scanner input=new Scanner(System.in);
+    private static int buyerCode;
+    private static String userName;
+    private static ArrayList<Integer> buyersWallet=new ArrayList<>();
+    private static ArrayList<String> buyers=new ArrayList<>();
+
+//The main part for using methods and classes
+    public static void main(String[] args) {
+        account.makeDefaultList();
+        account.defaultAdmin();
+        while (2>1) {
+            System.out.println("Enter the word \"Start\" to start the program and enter \"Stop\" to stop the program.");
+            String starter = input.next();
+            if (starter.equals("Start")) {
+                System.out.println("Welcome to the Sales System program.");
+                System.out.println("To enter the system, select and type your user type from the \"Seller\" or \"Buyer\".");
+                String accountType = input.next();
+                System.out.println("Please enter a username without using space.");
+                userName = input.next();
+                account.enroll(accountType, userName);
+                if (account.enroll(accountType, userName).equals("Seller")) {
+                    int adminCode=account.getAdmins().indexOf(userName);
+                    if (adminCode<0){
+                        System.out.println("You do not have permission to access this section.");
+                    }
+                    else {
+                        sellerInstructions();
+                        sellerOrders();
+                    }
+                }
+                if (account.enroll(accountType, userName).equals("Buyer")) {
+                    buyerCode = buyers.indexOf(userName);
+                    if (buyerCode < 0) {
+                        buyers.add(userName);
+                    }
+                    else account.setWalletBalance(buyersWallet.get(buyerCode));
+                        buyerInstructions();
+                        buyerOrder();
+                }
+            }
+            else if (starter.equals("Stop")){
+                break;
+            }
+        }
+    }
+
+//To take the seller's order and process it and execute the command
+    public static void sellerOrders() {
+        while (2 > 1) {
+            String sellerOrder=input.next();
+            if (sellerOrder.equals("Add")) {
+                System.out.println("Please enter the product name without using space.");
+                String newProductName = input.next();
+                System.out.println("Please enter the price of the product in Tomans.");
+                int newProductPrice = input.nextInt();
+                account.addNewProduct(newProductName, newProductPrice);
+            }
+            if (sellerOrder.equals("AddAdmin")) {
+                System.out.println("Enter the new admin username without using space.");
+                String newAdminName = input.next();
+                account.addAdmin(newAdminName);
+            }
+            if (sellerOrder.equals("RemoveAdmin")) {
+                System.out.println("Enter name of admin you want to delete.");
+                String deleteAdminName = input.next();
+                account.removeAdmin(deleteAdminName);
+                break;
+            }
+            if (sellerOrder.equals("Edit")) {
+                System.out.println("Enter \"Name\" to edit product name or enter \"Price\" to edit product price");
+                String editOrder = input.next();
+                if (editOrder.equals("Name")) {
+                    System.out.println("Enter the name of the product you want to rename.");
+                    String formerName = input.next();
+                    System.out.println("Enter the new name.");
+                    String newName = input.next();
+                    account.editNameViaFormerName(formerName, newName);
+                } else if (editOrder.equals("Price")) {
+                    System.out.println("Enter the name of the product you want to edit price.");
+                    String editPriceName = input.next();
+                    System.out.println("Enter new price.");
+                    int newPrice = input.nextInt();
+                    account.editPriceViaName(editPriceName, newPrice);
+                }
+            }
+            if (sellerOrder.equals("Remove")) {
+                System.out.println("Enter the name of the product you want to remove.");
+                String removeProduct = input.next();
+                account.removeProduct(removeProduct);
+            }
+            if (sellerOrder.equals("Profile")) {
+                account.showSales();
+            }
+            if (sellerOrder.equals("ShowProducts")) {
+                account.showProducts();
+            }
+            if (sellerOrder.equals("LogOut")) {
+                break;
+            }
+        }
+    }
+//To take the buyer's order and process it and execute the command
+    public static void buyerOrder(){
+        while (2 > 1) {
+            String buyerOrder = input.next();
+            if (buyerOrder.equals("ShowProducts")) {
+                account.showProducts();
+            }
+            if (buyerOrder.equals("AddToCart")) {
+                System.out.println("Enter the product name.");
+                String addToCartName = input.next();
+                account.addToCart(addToCartName);
+            }
+            if (buyerOrder.equals("Charge")) {
+                System.out.println("Enter your desired amount in tomans.");
+                int chargeWalletAmount = input.nextInt();
+                account.chargeWallet(chargeWalletAmount);
+            }
+            if (buyerOrder.equals("Complete")) {
+                account.completeTheOperation();
+            }
+            if (buyerOrder.equals("LogOut")) {
+                if (buyerCode<0) {
+                    buyersWallet.add(account.getWalletBalance());
+                }
+                if (buyerCode>=0){
+                    buyersWallet.set(buyerCode,account.getWalletBalance());
+                }
+                account.resetWallet();
+                account.resetCart();
+                account.resetTotalPrice();
+                break;
+            }
+        }
+    }
+//To show instructions for working with the seller's section
+    public static void sellerInstructions(){
+        System.out.println("Dear " + userName + ", use the following words to perform your desired operation.");
+        System.out.printf("%s: %s%n%s: %s%n%s: %s%n%s: %s%n%s: %s%n%s: %s%n", "Add", "To add a new product", "Edit", "To edit a product", "Profile", "To show the goods sold and the total profit earned", "ShowProducts", "To display the list of products", "AddAdmin", "To add new admin","RemoveAdmin","To remove an admin");
+        System.out.println("Remove: to remove product");
+        System.out.println("LogOut: to exit");
+    }
+////To show instructions for working with the buyer's section
+    public static void buyerInstructions(){
+        System.out.println("Dear " + userName + ", use the following words to perform your desired operation.");
+        System.out.printf("%s: %s%n%s: %s%n%s: %s%n%s: %s%n%s: %s%n", "ShowProducts", "To display the list of products", "AddToCart", "To add items to the cart", "Charge", "To charge your e-wallet", "Complete", "To view cart and complete the order and pay via e-wallet", "LogOut", "To exit");
+        System.out.println("Warning: Your cart will be deleted when you log out of your account!");
+    }
+}
