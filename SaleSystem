@@ -1,0 +1,226 @@
+//Mohammad Meydani 98472076
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
+//System for buying and selling goods and services
+public class SaleSystem {
+    private String accountType;
+    private String userName;
+    private int walletBalance;
+    private ArrayList<String > products;
+    private ArrayList<Integer> priceOfProducts;
+    private ArrayList<String > cart=new ArrayList();
+    private ArrayList<String > soldProducts=new ArrayList<>();
+    private ArrayList<String> admins=new ArrayList<>();
+    private int totalPrice=0;
+    private int totalProfit=0;
+
+//To convert 10000 to 10,000 and other numbers
+//input: integer
+    public static String formingNumbers(int number){
+        DecimalFormat format = new DecimalFormat("###,###,###,###");
+        String formatedNumber=format.format(number);
+        return formatedNumber;
+
+    }
+
+//makes defaul list of products
+    public void makeDefaultList(){
+        ArrayList<String > product=new ArrayList<>();
+        List goods= Arrays.asList("Bag","Shoes","Hat","Mask","Socks");
+        product.addAll(goods);
+        ArrayList<Integer> prices=new ArrayList<>();
+        List price=Arrays.asList(200000,350000,45000,1500,17000);
+        prices.addAll(price);
+        defaultList(product,prices);
+    }
+//Add Admin. Only Admins Can Access Sellers ُ Section
+//input: String: user name of new admin
+    public void defaultAdmin(){
+        admins.add("Admin");
+    }
+    public void addAdmin(String newAdmiName){
+        admins.add(newAdmiName);
+        System.out.println("Operation accomplished successfully.");
+    }
+//To remove admin
+//input: admin name
+    public void removeAdmin(String adminName){
+        admins.remove(admins.indexOf(adminName));
+        System.out.println("Admin "+adminName+" removed successfully");
+    }
+//Get Admins: This method provides list of admins To check the existence of the name entered in the list of admins
+    public ArrayList<String> getAdmins() {
+        return admins;
+    }
+
+//Select to join as a seller or buyer and Enroll method
+//input: type of account and user name
+    public String enroll(String accountType,String userName){
+        this.accountType=accountType;
+        this.userName=userName;
+        return accountType;
+    }
+
+//Default list of goods:To create a default list of goods
+    public void defaultList(ArrayList<String> products,ArrayList<Integer> priceOfProducts) {
+        this.products=products;
+        this.priceOfProducts=priceOfProducts;
+    }
+
+//View products method: To display the list of goods to the user
+    public void showProducts(){
+        System.out.printf("%s%14s%15s%n","Code","Name","Price");
+        for (int i=0;i<products.size();i++){
+            String name=products.get(i);
+            System.out.printf(" %-13d%-14s%s%n",i+1,name,formingNumbers(priceOfProducts.get(i)));
+        }
+    }
+
+//Add to cart method: To add the desired product to the user's cart
+//input: name of product
+    public void addToCart(String productName){
+        Scanner input=new Scanner(System.in);
+        int index = products.indexOf(productName);
+        if ( index < 0 )
+            System.out.println("The desired product is not available.");
+        else {
+            System.out.println("Product Name: " + productName);
+            System.out.println("Price: "+formingNumbers(priceOfProducts.get(index)));
+            System.out.println("Enter 1 to add \""+productName+"\" to the cart and enter another number to cancel.");
+            int confirm=input.nextInt();
+            if (confirm==1) {
+                cart.add(productName);
+                totalPrice+=priceOfProducts.get(index);
+                System.out.printf("\"%s\" %s%n",productName,"Successfully added to cart.");
+            }
+            else
+                System.out.println("Operation canceled successfully.");
+        }
+    }
+
+//Charge e-wallet method
+//input: The amount of money the user wants to add to his account
+    public void chargeWallet(int walletBalance){
+        this.walletBalance+=walletBalance;
+        System.out.println("Operation accomplished successfully.");
+        System.out.println("Total balance: "+formingNumbers(this.walletBalance));
+    }
+
+//View cart and Complete the order and Pay via e-wallet method
+    public void completeTheOperation() {
+        if (cart.size() < 1)
+            System.out.println("Your cart is empty.");
+        else {
+            System.out.printf("%s%14s%15s%n", "Num", "Name", "Price");
+            for (int i = 0; i < cart.size(); i++) {
+                String name = cart.get(i);
+                System.out.printf(" %-12d%-14s%s%n", i + 1, name, formingNumbers(priceOfProducts.get(products.indexOf(name))));
+            }
+            System.out.println("Total Price: " + formingNumbers(totalPrice));
+            System.out.println("Enter 1 to continue the process and pay via the wallet and enter another number to cancel.");
+            Scanner input = new Scanner(System.in);
+            int confirm = input.nextInt();
+            if (confirm == 1) {
+                if (walletBalance >= totalPrice) {
+                    walletBalance -= totalPrice;
+                    totalProfit += totalPrice;
+                    System.out.println("congratulations!  Operation accomplished successfully.");
+                    System.out.println("New balance: " + formingNumbers(walletBalance));
+                    for (int i = 0; i < cart.size(); i++) {
+                        soldProducts.add(cart.get(i));
+                        cart.remove(i);
+                    }
+                }
+                else
+                    System.out.println("Your wallet balance is not enough. Please charge your wallet.");
+            }
+            else
+                System.out.println("Operation canceled successfully.");
+        }
+    }
+
+
+//Add a new product as admin
+//input: name and price of the product
+    public void addNewProduct(String newProductName,int newProductPrice){
+        products.add(newProductName);
+        priceOfProducts.add(newProductPrice);
+        System.out.println("\""+newProductName+"\" successfully added at a price of "+newProductPrice+" Tomans");
+    }
+
+
+//Edit product name via former name of product method
+//input: former name and new name
+    public void editNameViaFormerName(String productFormerName,String newName) {
+        int index = products.indexOf(productFormerName);
+        if (index < 0)
+            System.out.println("Item not found");
+        else {
+            products.set(index, newName);
+            System.out.println("Operation accomplished successfully.");
+        }
+    }
+
+//Edit product price via name of the product
+//input: name and new price of product
+    public void editPriceViaName(String productName,int newPrice) {
+        int index = products.indexOf(productName);
+        if (index < 0)
+            System.out.println("Item not found");
+        else {
+            priceOfProducts.set(index, newPrice);
+            System.out.println("Operation accomplished successfully.");
+        }
+    }
+
+//Remove product from list
+//input: name of product
+    public void removeProduct(String productName){
+        int index = products.indexOf(productName);
+        if (index < 0)
+            System.out.println("Item not found");
+        else {
+            products.remove(index);
+            priceOfProducts.remove(index);
+            System.out.println( "\""+productName+"\" removed successfully.");
+        }
+    }
+
+//Reset Wallet: To enable the creation of multiple accounts in the system
+    public void resetWallet(){
+        walletBalance=0;
+    }
+
+//Reset Cart: To enable the creation of multiple accounts in the system
+    public void resetCart(){
+        for (int i=0;i<cart.size();i++){
+            cart.remove(i);
+        }
+    }
+    public void resetTotalPrice(){
+        totalPrice=0;
+    }
+
+//Get wallet balance: To make it possible to keep the previous wallet and add new money to that amount for each user
+    public int getWalletBalance() {
+        return walletBalance;
+    }
+
+//Show sales: To show the goods sold as well as the amount of revenue earned
+    public void showSales(){
+        System.out.printf("%s%14s%15s%n", "Num", "Name", "Price");
+        for (int i = 0; i < soldProducts.size(); i++) {
+            String name = this.soldProducts.get(i);
+            System.out.printf(" %-12d%-14s%s%n", i + 1, name, formingNumbers(priceOfProducts.get(products.indexOf(name))));
+        }
+        System.out.println("Total Profit: "+totalProfit);
+    }
+//To make it possible to keep the previous wallet and add new money to that amount for each user
+    public void setWalletBalance(int walletBalance) {
+        this.walletBalance = walletBalance;
+    }
+}
